@@ -1,0 +1,22 @@
+{
+  "name": "almacen-pro-mongodb-admin",
+  "version": "2.1.0",
+  "type": "module",
+  "description": "Sistema administrativo para almacén con Node, Express y MongoDB, reforzado en backend para operaciones críticas.",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "check": "node scripts/check-syntax.mjs",
+    "test": "node --test tests/*.test.js",
+    "test:watch": "node --test --watch tests/*.test.js",
+    "test:integration": "node --test tests/integration/**/*.test.js",
+    "test:all": "npm test && npm run test:integration"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.2.0"
+  }
+}
