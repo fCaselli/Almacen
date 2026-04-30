@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="84" y1="48" x2="436" y2="458" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CF0AE"/>
+      <stop offset="1" stop-color="#2B8E59"/>
+    </linearGradient>
+    <linearGradient id="awning" x1="112" y1="128" x2="400" y2="208" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6FFF8"/>
+      <stop offset="1" stop-color="#DAF7E4"/>
+    </linearGradient>
+  </defs>
+  <rect x="40" y="40" width="432" height="432" rx="120" fill="#08100D"/>
+  <rect x="64" y="64" width="384" height="384" rx="104" fill="url(#bg)" opacity="0.17"/>
+  <path d="M136 168C136 142.49 156.49 122 182 122H330C355.51 122 376 142.49 376 168V186H136V168Z" fill="#102118"/>
+  <path d="M112 180H400L382 244C377.43 260.24 362.62 271.5 345.75 271.5C329.33 271.5 314.79 261.25 309.13 245.83L307.5 241.38L305.87 245.83C300.21 261.25 285.67 271.5 269.25 271.5C252.83 271.5 238.29 261.25 232.63 245.83L231 241.38L229.37 245.83C223.71 261.25 209.17 271.5 192.75 271.5C175.88 271.5 161.07 260.24 156.5 244L112 180Z" fill="url(#awning)"/>
+  <path d="M152 270H360V382C360 398.57 346.57 412 330 412H182C165.43 412 152 398.57 152 382V270Z" fill="#F5FFF7"/>
+  <rect x="184" y="296" width="72" height="116" rx="20" fill="#143425"/>
+  <rect x="270" y="296" width="58" height="56" rx="16" fill="#DBF9E6" stroke="#2B8E59" stroke-width="12"/>
+  <path d="M291 211V148" stroke="#143425" stroke-width="14" stroke-linecap="round"/>
+  <path d="M181 334H231" stroke="#7CF0AE" stroke-width="12" stroke-linecap="round"/>
+  <path d="M294 326H304" stroke="#2B8E59" stroke-width="12" stroke-linecap="round"/>
+  <path d="M136 180L156.5 244" stroke="#2B8E59" stroke-width="11" stroke-linecap="round"/>
+  <path d="M191 180L205 245" stroke="#2B8E59" stroke-width="11" stroke-linecap="round"/>
+  <path d="M246 180L231 245" stroke="#2B8E59" stroke-width="11" stroke-linecap="round"/>
+  <path d="M301 180L307 241" stroke="#2B8E59" stroke-width="11" stroke-linecap="round"/>
+  <path d="M356 180L345.5 244" stroke="#2B8E59" stroke-width="11" stroke-linecap="round"/>
+</svg>

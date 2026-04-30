@@ -1,6 +1,107 @@
+# =========================
+# Dependencias
+# =========================
 node_modules/
+
+# =========================
+# Variables de entorno / secretos
+# =========================
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+!.env.example
+
+# =========================
+# Logs
+# =========================
+logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# Sistema operativo / editores
+# =========================
 .DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+.history/
+
+# =========================
+# Builds / coverage / temporales
+# =========================
 coverage/
-data/
+.nyc_output/
+dist/
+build/
+.tmp/
+tmp/
+out/
+.cache/
+.parcel-cache/
+
+# =========================
+# Resultados de testing
+# =========================
+playwright-report/
+test-results/
+
+# =========================
+# Runtime
+# =========================
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Dumps / exports / backups de base de datos
+# =========================
+*.archive
+*.bson
+*.metadata.json
+mongodump/
+mongoexport/
+exports/
+backups/
+
+# =========================
+# Restos de SQLite u otras bases locales viejas
+# =========================
+*.db
+*.db-shm
+*.db-wal
+/data/
+
+# =========================
+# Archivos comprimidos / artefactos locales
+# =========================
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+
+# =========================
+# Archivos de deploy o hosting local
+# =========================
+.vercel/
+.netlify/
+.railway/
+
+# =========================
+# Misceláneo
+# =========================
+*.stackdump

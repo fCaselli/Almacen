@@ -1,36 +1,80 @@
-# Almacén Pro — versión consolidada y reforzada
+# Almacén Pro
 
-Esta versión deja el proyecto más limpio y sólido para seguir creciendo sin arrastrar restos de etapas anteriores.
+Sistema administrativo para un almacén con **frontend web**, **backend en Node.js + Express** y **MongoDB** como base de datos.
 
-## Qué mejoró en esta entrega
+Esta versión está preparada para:
+- usar `index.html` en la raíz del proyecto
+- publicar el frontend en **GitHub Pages**
+- correr el backend por separado en local o desplegado
+- trabajar con módulos de negocio reales del almacén
 
-### Limpieza del proyecto
-- se eliminaron archivos viejos de SQLite que ya no formaban parte del stack actual
-- se dejó el repo alineado a **MongoDB + Node + Express**
-- se ajustó `.gitignore` para no volver a subir artefactos que ya no sirven
+---
 
-### Robustez del backend
-- creación segura de colecciones e índices faltantes
-- auditoría desacoplada: si falla el log de auditoría no rompe la operación principal
-- refuerzo de validaciones para productos, proveedores y compras
-- mayor consistencia en operaciones sensibles sobre stock, lotes y compras
+## Qué incluye hoy
 
-### Operaciones críticas más seguras
-- el alta de compras ahora protege mejor la integridad del sistema
-- si una compra falla durante la aplicación de stock/lotes/ajustes, intenta **revertir** los cambios ya hechos
-- las compras en estado `pending` ya no impactan stock hasta quedar aplicadas
+- Gestión de productos
+- Gestión de proveedores
+- Registro de compras
+- Lotes con vencimiento
+- Alertas automáticas por stock y vencimiento
+- Acciones sobre lotes y alertas
+- Auditoría básica
+- Tests de validadores y utilidades
+- Branding visual con favicon e identidad de almacén
 
-### Más trabajo resuelto desde Mongo
-- productos: filtros, búsqueda, orden y paginación desde backend
-- proveedores: filtros, búsqueda, orden y paginación desde backend
-- compras: filtros, fechas, orden y paginación desde backend
-- lotes: filtros, búsqueda, orden y paginación desde backend
-- audit logs: filtros y paginación desde backend
+---
+
+## Tecnologías
+
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Node.js, Express
+- **Base de datos:** MongoDB
+- **Arquitectura:** capas (`routes`, `controllers`, `services`, `repositories`, `validators`, `middlewares`)
+
+---
+
+## Estructura del proyecto
+
+```text
+almacen/
+├── index.html
+├── 404.html
+├── MANUAL_DE_USUARIO.md
+├── public/
+│   ├── styles.css
+│   ├── script.js
+│   ├── favicon.ico
+│   └── assets/
+├── scripts/
+│   └── check-syntax.mjs
+├── src/
+│   ├── app.js
+│   ├── server.js
+│   ├── config/
+│   ├── controllers/
+│   ├── errors/
+│   ├── middlewares/
+│   ├── repositories/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   └── validators/
+├── tests/
+├── .env.example
+├── .gitignore
+├── package.json
+└── README.md
+```
+
+---
 
 ## Requisitos
 
-- Node.js 20+
-- MongoDB local o Atlas
+- **Node.js 20 o superior**
+- **MongoDB** local o en Atlas
+- npm
+
+---
 
 ## Instalación
 
@@ -38,9 +82,13 @@ Esta versión deja el proyecto más limpio y sólido para seguir creciendo sin a
 npm install
 ```
 
-Copiá `.env.example` a `.env` y completá tus valores.
+---
 
-## Variables de entorno
+## Configuración del entorno
+
+Copiá `.env.example` a `.env` y completalo.
+
+Ejemplo:
 
 ```env
 PORT=3000
@@ -48,7 +96,11 @@ MONGODB_URI=mongodb://127.0.0.1:27017
 DB_NAME=almacen_pro
 ```
 
-## Desarrollo
+---
+
+## Cómo levantar el proyecto
+
+### Desarrollo
 
 ```bash
 npm run dev
@@ -56,156 +108,190 @@ npm run dev
 
 Abrí:
 
-```txt
+```text
 http://localhost:3000
 ```
 
-## Reset de demo
+### Producción/local simple
+
+```bash
+npm start
+```
+
+---
+
+## Scripts disponibles
+
+```bash
+npm run dev
+npm start
+npm run check
+npm test
+npm run test:watch
+```
+
+### Qué hace cada uno
+
+- `npm run dev`: arranca el servidor con recarga automática
+- `npm start`: arranca el servidor normal
+- `npm run check`: revisa sintaxis del proyecto
+- `npm test`: corre los tests
+- `npm run test:watch`: corre tests en modo watch
+
+---
+
+## Manual de usuario
+
+Se incluye un archivo aparte pensado para usuarios no técnicos:
+
+- `MANUAL_DE_USUARIO.md`
+
+Ese archivo explica cómo operar el sistema completo como si lo usara un cliente o empleado por primera vez.
+
+---
+
+## Cómo funciona GitHub Pages en este proyecto
+
+Este proyecto quedó preparado para que **el frontend** pueda publicarse en GitHub Pages porque:
+
+- `index.html` está en la raíz
+- `404.html` replica la entrada principal para tolerar recargas
+- los assets cargan desde `./public/...`
+
+### Importante
+
+**GitHub Pages no ejecuta Node.js ni MongoDB.**
+
+Eso significa:
+
+- **sí** podés publicar la interfaz
+- **no** podés ejecutar el backend completo dentro de GitHub Pages
+
+Si querés que el sistema completo funcione online, necesitás:
+
+- frontend en GitHub Pages
+- backend desplegado aparte
+- MongoDB accesible desde ese backend
+
+---
+
+## Publicar el frontend en GitHub Pages
+
+1. Subí este proyecto a GitHub.
+2. Entrá al repositorio.
+3. Andá a **Settings > Pages**.
+4. En **Build and deployment**, elegí:
+   - **Source:** Deploy from a branch
+   - **Branch:** `main`
+   - **Folder:** `/root`
+5. Guardá.
+
+Después de unos minutos, GitHub te va a dar una URL pública.
+
+---
+
+## Cómo usarlo localmente con MongoDB
+
+1. Levantá MongoDB.
+2. Ejecutá `npm run dev`.
+3. Entrá a `http://localhost:3000`.
+4. Si querés volver a datos demo:
 
 ```powershell
 Invoke-RestMethod -Method POST http://localhost:3000/api/reset-demo
 ```
 
-## Chequeos útiles
-
-### Sintaxis
-
-```bash
-npm run check
-```
-
-### Tests
-
-```bash
-npm test
-```
+---
 
 ## Endpoints principales
 
+### Salud y dashboard
 - `GET /api/health`
 - `GET /api/dashboard`
 - `POST /api/reset-demo`
+
+### Productos
 - `GET /api/products`
 - `POST /api/products`
 - `PUT /api/products/:id`
 - `DELETE /api/products/:id`
-- `POST /api/products/:id/reorder-suggestion`
+
+### Proveedores
 - `GET /api/providers`
 - `POST /api/providers`
 - `PUT /api/providers/:id`
 - `DELETE /api/providers/:id`
+
+### Compras
 - `GET /api/purchases`
 - `GET /api/purchases/:id`
 - `POST /api/purchases`
+
+### Lotes y alertas
 - `GET /api/lots`
-- `POST /api/lots/:id/mark-expired`
-- `POST /api/lots/:id/waste`
-- `POST /api/lots/:id/promotion`
 - `GET /api/alerts`
-- `POST /api/alerts/:key/resolve`
-- `POST /api/alerts/:key/reopen`
-- `GET /api/audit-logs`
-
-## Ejemplos de query params
-
-### Productos
-
-`GET /api/products?page=1&limit=12&sort=name&order=asc&q=leche&category=Lácteos&status=low`
-
-### Proveedores
-
-`GET /api/providers?page=1&limit=10&sort=name&order=asc&q=distribuidora`
-
-### Compras
-
-`GET /api/purchases?page=1&limit=10&sort=purchasedAt&order=desc&status=received&providerId=...&dateFrom=2026-04-01&dateTo=2026-04-30`
-
-### Lotes
-
-`GET /api/lots?page=1&limit=10&sort=expiry&order=asc&status=urgente&days=30&q=leche`
 
 ### Auditoría
+- `GET /api/audit-logs`
 
-`GET /api/audit-logs?page=1&limit=25&sort=createdAt&order=desc&entityType=product&q=actualizó`
+---
 
-## Respuesta de ejemplo
+## Filtros y paginación desde backend
 
-Los listados principales devuelven una estructura como esta:
-
-```json
-{
-  "items": [],
-  "meta": {
-    "total": 0,
-    "page": 1,
-    "limit": 10,
-    "totalPages": 1,
-    "hasPrevPage": false,
-    "hasNextPage": false,
-    "sort": "name",
-    "order": "asc"
-  }
-}
+### Productos
+```text
+GET /api/products?page=1&limit=12&sort=name&order=asc&q=leche&category=Lácteos&status=low
 ```
 
-## Qué conviene hacer a partir de esta base
-
-Ahora que el proyecto quedó más limpio y más seguro, el camino recomendable es:
-
-1. **tests de integración reales sobre rutas**
-   - `POST /api/products`
-   - `POST /api/providers`
-   - `POST /api/purchases`
-   - `POST /api/lots/:id/waste`
-   - `POST /api/alerts/:key/resolve`
-
-2. **acciones más robustas sobre compras pendientes**
-   - recibir una compra pendiente
-   - cancelar compra pendiente
-   - convertir compra pendiente en aplicada
-
-3. **reportes de negocio**
-   - compras por período
-   - stock bajo
-   - lotes por vencer
-   - pérdidas por merma/vencimiento
-
-4. **cierre operativo**
-   - historial más rico de acciones
-   - más trazabilidad sobre quién hizo qué
-   - exportes y reportes administrativos
-
-## Nota
-
-En este entorno pude validar la sintaxis y los tests unitarios locales. La prueba completa contra MongoDB real sigue dependiendo de tu entorno local y de tu base.
-
-
-## Tests de integración
-
-Con MongoDB local corriendo, podés ejecutar pruebas de integración de rutas y flujo de compras pendientes con:
-
-```bash
-npm run test:integration
+### Proveedores
+```text
+GET /api/providers?page=1&limit=10&sort=name&order=asc&q=distribuidora
 ```
 
-Si querés correr todo junto:
-
-```bash
-npm run test:all
+### Compras
+```text
+GET /api/purchases?page=1&limit=10&sort=purchasedAt&order=desc&status=received&providerId=...&dateFrom=2026-04-01&dateTo=2026-04-30
 ```
 
-Estas pruebas levantan la app contra una base de datos temporal y validan:
-- alta de proveedores y productos
-- compra pendiente
-- recepción de compra pendiente
-- cancelación de compra pendiente
-- lotes y alertas básicas
+### Lotes
+```text
+GET /api/lots?page=1&limit=10&sort=expiry&order=asc&status=urgente&days=30&q=leche
+```
 
+### Alertas
+```text
+GET /api/alerts?page=1&limit=10&sort=priority&order=desc&type=low_stock&priority=high&days=30
+```
 
-## Flujo de compras pendientes
+---
 
-La API ahora soporta un flujo más seguro para compras pendientes:
+## Estado actual del proyecto
 
-- `POST /api/purchases` con `status: "pending"` guarda la compra sin tocar inventario.
-- `POST /api/purchases/:id/receive` aplica stock, crea lotes y deja la compra como recibida.
-- `POST /api/purchases/:id/cancel` cancela una compra pendiente sin modificar stock.
+Esta base ya permite trabajar con:
+
+- productos
+- proveedores
+- compras
+- lotes
+- alertas
+- acciones sobre lotes/alertas
+- auditoría básica
+- frontend listo para publicación del lado cliente
+
+---
+
+## Recomendaciones para seguir
+
+Si después de subir esta versión querés seguir mejorándola, el camino más lógico es:
+
+1. **Tests de integración reales**
+2. **Flujo más completo de compras pendientes**
+3. **Reportes administrativos**
+4. **Despliegue del backend** en Render, Railway o VPS
+5. **Conectar el frontend publicado** a una API online
+
+---
+
+## Cierre
+
+Esta versión está pensada como una base estable para subir el proyecto y seguir evolucionándolo sin perder orden.

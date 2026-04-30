@@ -24,12 +24,19 @@ function resolveApiBaseUrl() {
   const metaValue = document.querySelector('meta[name="api-base-url"]')?.content?.trim();
   if (metaValue) return normalizeBase(metaValue);
 
+  try {
+    const stored = window.localStorage.getItem("almacen_api_base_url")?.trim();
+    if (stored) return normalizeBase(stored);
+  } catch {}
+
   const { protocol, hostname, port, origin } = window.location;
   const isLocal = ["localhost", "127.0.0.1"].includes(hostname);
+  const isGithubPages = hostname.endsWith("github.io");
 
   if (protocol === "file:") return "http://localhost:3000";
   if (port === "3000") return origin;
   if (isLocal) return "http://localhost:3000";
+  if (isGithubPages) return "http://localhost:3000";
   return origin;
 }
 

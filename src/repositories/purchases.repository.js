@@ -16,19 +16,13 @@ export const purchasesRepository = {
   findById(_id) {
     return this.collection().findOne({ _id });
   },
-  insertOne(doc, options = {}) {
-    return this.collection().insertOne(doc, options);
-  },
-  updateById(_id, update, options = {}) {
-    return this.collection().findOneAndUpdate({ _id }, update, options);
-  },
-  deleteById(_id, options = {}) {
-    return this.collection().deleteOne({ _id }, options);
+  insertOne(doc) {
+    return this.collection().insertOne(doc);
   },
   countDocuments(filter = {}) {
     return this.collection().countDocuments(filter);
   },
-  deleteMany(filter = {}, options = {}) {
-    return this.collection().deleteMany(filter, options);
+  deleteMany(filter = {}) {
+    return this.collection().deleteMany(filter);
   },
 };

@@ -12,23 +12,9 @@ export async function connectToDatabase() {
   return { client, db };
 }
 
-export function getClient() {
-  if (!client) throw new Error('El cliente de MongoDB no está inicializado.');
-  return client;
-}
-
 export function getDb() {
   if (!db) throw new Error('La base de datos no está inicializada.');
   return db;
-}
-
-export async function ensureCollection(name) {
-  const database = getDb();
-  const existing = await database.listCollections({ name }).toArray();
-  if (!existing.length) {
-    await database.createCollection(name);
-  }
-  return database.collection(name);
 }
 
 export function getCollection(name) {
@@ -44,7 +30,6 @@ export function getCollections() {
     alertResolutions: getCollection('alert_resolutions'),
     reorderRequests: getCollection('reorder_requests'),
     stockAdjustments: getCollection('stock_adjustments'),
-    auditLogs: getCollection('audit_logs'),
   };
 }
 

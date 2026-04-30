@@ -2,8 +2,8 @@ import { objectIdOrNull } from '../utils/common.js';
 import { AppError } from '../errors/AppError.js';
 import { createProvider, deleteProvider, listProviders, updateProvider } from '../services/providers.service.js';
 
-export async function getProviders(req, res) {
-  res.json(await listProviders(req.query));
+export async function getProviders(_req, res) {
+  res.json(await listProviders());
 }
 
 export async function postProvider(req, res) {

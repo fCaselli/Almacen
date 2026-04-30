@@ -2,51 +2,13 @@ import { AppError } from '../errors/AppError.js';
 import { productsRepository } from '../repositories/products.repository.js';
 import { providersRepository } from '../repositories/providers.repository.js';
 import { purchasesRepository } from '../repositories/purchases.repository.js';
-import { buildContainsRegex, cleanObject, now, normalizeText } from '../utils/common.js';
-import { buildPaginationMeta, parsePagination, parseSort } from '../utils/pagination.js';
+import { now } from '../utils/common.js';
 import { serializeProvider } from '../utils/serialize.js';
 import { validateProviderInput } from '../validators/provider.validator.js';
 import { logAudit } from './audit.service.js';
 
-const PROVIDER_SORTS = {
-  name: 'name',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-};
-
-function buildProvidersFilter(query = {}) {
-  const q = buildContainsRegex(query.q);
-  const filter = {};
-
-  if (q) {
-    filter.$or = [
-      { name: q },
-      { contactName: q },
-      { phone: q },
-      { email: q },
-      { notes: q },
-    ];
-  }
-
-  return filter;
-}
-
-export async function listProviders(query = {}) {
-  const { page, limit, skip } = parsePagination(query, { defaultLimit: 12, maxLimit: 100 });
-  const { sort, order } = parseSort(query, {
-    defaultSort: 'name',
-    defaultOrder: 'asc',
-    allowedSorts: Object.keys(PROVIDER_SORTS),
-  });
-
-  const filter = buildProvidersFilter(query);
-  const mongoSort = { [PROVIDER_SORTS[sort] || 'name']: order === 'asc' ? 1 : -1 };
-
-  const [docs, total] = await Promise.all([
-    providersRepository.findPaged(filter, { sort: mongoSort, skip, limit }),
-    providersRepository.countDocuments(filter),
-  ]);
-
+export async function listProviders() {
+  const docs = await providersRepository.findAllSorted();
   const items = await Promise.all(docs.map(async (provider) => {
     const [purchaseCount, productCount] = await Promise.all([
       purchasesRepository.countDocuments({ providerId: provider._id }),
@@ -54,11 +16,7 @@ export async function listProviders(query = {}) {
     ]);
     return serializeProvider(provider, { purchaseCount, productCount });
   }));
-
-  return {
-    items,
-    meta: buildPaginationMeta({ total, page, limit, sort, order }),
-  };
+  return { items };
 }
 
 export async function createProvider(body) {

@@ -4,79 +4,45 @@ import { productsRepository } from '../repositories/products.repository.js';
 import { providersRepository } from '../repositories/providers.repository.js';
 import { purchasesRepository } from '../repositories/purchases.repository.js';
 import { reorderRequestsRepository } from '../repositories/reorder-requests.repository.js';
-import { asCurrencyNumber, buildContainsRegex, cleanObject, normalizeKey, normalizeText, now } from '../utils/common.js';
-import { buildPaginationMeta, parsePagination, parseSort } from '../utils/pagination.js';
+import { asCurrencyNumber, normalizeKey, normalizeText, now } from '../utils/common.js';
 import { serializeDocument, serializeProduct } from '../utils/serialize.js';
 import { validateProductInput } from '../validators/product.validator.js';
 import { logAudit } from './audit.service.js';
 
-const PRODUCT_SORTS = {
-  name: 'name',
-  category: 'category',
-  stock: 'stock',
-  price: 'price',
-  updatedAt: 'updatedAt',
-  createdAt: 'createdAt',
-};
-
-function buildProductsFilter(query = {}) {
-  const q = buildContainsRegex(query.q);
-  const category = normalizeText(query.category);
-  const status = normalizeText(query.status).toLowerCase();
-  const filter = cleanObject({
-    ...(category ? { category } : {}),
-  });
-
-  if (q) {
-    filter.$or = [
-      { name: q },
-      { category: q },
-      { supplierName: q },
-      { location: q },
-      { barcode: q },
-    ];
-  }
-
-  if (status === 'low') {
-    filter.$expr = { $lte: ['$stock', '$minStock'] };
-  } else if (status === 'ok') {
-    filter.$expr = { $gt: ['$stock', '$minStock'] };
-  } else if (status === 'empty') {
-    filter.stock = { $lte: 0 };
-  }
-
-  return filter;
-}
-
 export async function listProducts(query = {}) {
-  const { page, limit, skip } = parsePagination(query, { defaultLimit: 12, maxLimit: 100 });
-  const { sort, order } = parseSort(query, {
-    defaultSort: 'name',
-    defaultOrder: 'asc',
-    allowedSorts: Object.keys(PRODUCT_SORTS),
+  const q = normalizeText(query.q).toLowerCase();
+  const category = normalizeText(query.category);
+  const status = normalizeText(query.status);
+  const sort = normalizeText(query.sort || 'name');
+
+  const docs = await productsRepository.findAll();
+  const filtered = docs.filter((item) => {
+    const haystack = [item.name, item.category, item.supplierName, item.location, item.barcode].join(' ').toLowerCase();
+    const matchesQuery = !q || haystack.includes(q);
+    const matchesCategory = !category || item.category === category;
+    let matchesStatus = true;
+    if (status === 'low') matchesStatus = Number(item.stock || 0) <= Number(item.minStock || 0);
+    if (status === 'ok') matchesStatus = Number(item.stock || 0) > Number(item.minStock || 0);
+    if (status === 'empty') matchesStatus = Number(item.stock || 0) <= 0;
+    return matchesQuery && matchesCategory && matchesStatus;
   });
 
-  const filter = buildProductsFilter(query);
-  const mongoSort = { [PRODUCT_SORTS[sort] || 'name']: order === 'asc' ? 1 : -1 };
+  const sorters = {
+    name: (a, b) => a.name.localeCompare(b.name, 'es'),
+    category: (a, b) => a.category.localeCompare(b.category, 'es'),
+    stock: (a, b) => Number(b.stock || 0) - Number(a.stock || 0),
+    price: (a, b) => Number(b.price || 0) - Number(a.price || 0),
+    updatedAt: (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+  };
 
-  const [docs, total, categories] = await Promise.all([
-    productsRepository.findPaged(filter, { sort: mongoSort, skip, limit }),
-    productsRepository.countDocuments(filter),
-    productsRepository.distinctCategories({}),
-  ]);
+  filtered.sort(sorters[sort] || sorters.name);
 
   return {
-    items: docs.map(serializeProduct),
-    meta: buildPaginationMeta({
-      total,
-      page,
-      limit,
-      sort,
-      order,
-      extra: {
-        categories: categories.filter(Boolean).sort((a, b) => a.localeCompare(b, 'es')),
-      },
-    }),
+    items: filtered.map(serializeProduct),
+    meta: {
+      total: filtered.length,
+      categories: [...new Set(docs.map((item) => item.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')),
+    },
   };
 }
 
@@ -85,8 +51,7 @@ export async function createProduct(body) {
   const existing = await productsRepository.findByNormalizedName(payload.normalizedName);
   if (existing) throw new AppError('Ya existe un producto con ese nombre.', 409, null, 'PRODUCT_DUPLICATE');
 
-  const supplierNormalizedName = normalizeKey(payload.supplierName);
-  const supplier = supplierNormalizedName ? await providersRepository.findByNormalizedName(supplierNormalizedName) : null;
+  const supplier = payload.supplierName ? await providersRepository.findByNormalizedName(payload.supplierName ? payload.supplierName.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase() : '') : null;
   const doc = {
     ...payload,
     supplierId: supplier?._id || null,
@@ -115,8 +80,7 @@ export async function updateProduct(id, body) {
   const existing = await productsRepository.findById(id);
   if (!existing) throw new AppError('Producto no encontrado.', 404, null, 'PRODUCT_NOT_FOUND');
 
-  const supplierNormalizedName = normalizeKey(payload.supplierName);
-  const supplier = supplierNormalizedName ? await providersRepository.findByNormalizedName(supplierNormalizedName) : null;
+  const supplier = payload.supplierName ? await providersRepository.findByNormalizedName(payload.supplierName.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()) : null;
   const updated = await productsRepository.updateById(
     id,
     { $set: { ...payload, supplierId: supplier?._id || null } },

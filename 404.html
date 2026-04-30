@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Almacén Pro Admin</title>
+    <meta name="api-base-url" content="" />
+    <meta name="description" content="Sistema administrativo para un almacén con control de productos, compras, proveedores, lotes y alertas." />
+    <meta name="theme-color" content="#0d1110" />
+    <link rel="icon" type="image/svg+xml" href="./public/assets/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./public/assets/favicon-192.png" />
+    <link rel="apple-touch-icon" href="./public/assets/apple-touch-icon.png" />
+    <link rel="stylesheet" href="./public/styles.css?v=9" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-card">
+          <div class="brand-logo">
+            <img src="./public/assets/store-logo.svg" alt="Logo de Almacén Pro" class="brand-logo-image" />
+          </div>
+          <div>
+            <p class="eyebrow">Sistema administrativo</p>
+            <h1>Almacén Pro</h1>
+            <p class="brand-copy">Más claro para trabajar, reponer y prevenir problemas a tiempo.</p>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <p class="nav-group-title">Principal</p>
+          <nav class="sidebar-nav">
+            <button class="nav-item active" data-view="dashboard">
+              <span class="nav-leading">
+                <span class="nav-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6v7H4zm10-9h6v16h-6zM4 4h6v7H4zm10 5h6v5h-6z"/></svg>
+                </span>
+                <span class="nav-text">Dashboard</span>
+              </span>
+            </button>
+            <button class="nav-item" data-view="products">
+              <span class="nav-leading">
+                <span class="nav-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.5 12 3 3 7.5m18 0v9L12 21m9-13.5L12 12M3 7.5v9L12 21m0-9L3 7.5m9 4.5v9"/></svg>
+                </span>
+                <span class="nav-text">Productos</span>
+              </span>
+            </button>
+            <button class="nav-item" data-view="purchases">
+              <span class="nav-leading">
+                <span class="nav-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.5 7.5h-12zM6 6 4 3H1m7.5 15a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm11 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg>
+                </span>
+                <span class="nav-text">Compras</span>
+              </span>
+            </button>
+            <button class="nav-item" data-view="providers">
+              <span class="nav-leading">
+                <span class="nav-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V9l7-4 7 4v12M9 13h.01M15 13h.01M9 17h.01M15 17h.01"/></svg>
+                </span>
+                <span class="nav-text">Proveedores</span>
+              </span>
+            </button>
+            <button class="nav-item" data-view="lots">
+              <span class="nav-leading">
+                <span class="nav-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 3l8 4.5v9L12 21 4 16.5zm0 0 8 4.5 8-4.5"/></svg>
+                </span>
+                <span class="nav-text">Lotes</span>
+              </span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="nav-group nav-group-alerts">
+          <p class="nav-group-title">Control</p>
+          <nav class="sidebar-nav">
+            <button class="nav-item nav-item-alert" data-view="alerts">
+              <span class="nav-leading">
+                <span class="nav-icon nav-icon-alert">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 17H9m6 0H9m6 0a3 3 0 0 1-6 0m10-3H5l2-2v-3a5 5 0 1 1 10 0v3z"/></svg>
+                </span>
+                <span class="nav-text">Alertas</span>
+              </span>
+              <span class="nav-badge" id="sidebarAlertsBadge">0</span>
+            </button>
+          </nav>
+        </div>
+
+        <section class="sidebar-card">
+          <p class="sidebar-card-title">Acciones rápidas</p>
+          <div class="stack compact-stack">
+            <button class="btn btn-primary" id="quickNewProduct">Nuevo producto</button>
+            <button class="btn btn-secondary" id="quickNewPurchase">Nueva compra</button>
+            <button class="btn btn-secondary" id="quickNewProvider">Nuevo proveedor</button>
+            <button class="btn btn-secondary" id="quickLotsBtn">Ver lotes</button>
+            <button class="btn btn-ghost" id="resetDemoBtn">Restaurar demo</button>
+          </div>
+        </section>
+
+        <section class="sidebar-card">
+          <p class="sidebar-card-title">Estado</p>
+          <div class="status-pill" id="connectionStatus">Conectando sistema...</div>
+          <p class="sidebar-hint">
+            Las alertas aparecen solas a medida que vence mercadería o faltan productos. Desde ahí podés ir directo a resolver cada caso.
+          </p>
+        </section>
+      </aside>
+
+      <main class="main-area">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow" id="headerEyebrow">Panel operativo</p>
+            <h2 id="pageTitle">Dashboard</h2>
+            <p class="page-subtitle" id="pageSubtitle">
+              Vista general para controlar productos, compras y proveedores desde un mismo lugar.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost" id="refreshBtn">Actualizar datos</button>
+            <button class="btn btn-primary" id="contextPrimaryAction">Nuevo producto</button>
+          </div>
+        </header>
+
+        <section class="view active" id="view-dashboard">
+          <section class="alert-banner" id="dashboardAlertBanner"></section>
+
+          <div class="stats-grid">
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-products">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.5 12 3 3 7.5m18 0v9L12 21m9-13.5L12 12M3 7.5v9L12 21m0-9L3 7.5m9 4.5v9"/></svg>
+              </div>
+              <span class="stat-label">Productos</span>
+              <strong class="stat-value" id="statProducts">0</strong>
+              <span class="stat-help">Catálogo total</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-units">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6v7H4zm10-9h6v16h-6zM4 4h6v7H4zm10 5h6v5h-6z"/></svg>
+              </div>
+              <span class="stat-label">Unidades</span>
+              <strong class="stat-value" id="statUnits">0</strong>
+              <span class="stat-help">Stock total</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-warning">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.72 3h16.92a2 2 0 0 0 1.72-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+              </div>
+              <span class="stat-label">Bajo mínimo</span>
+              <strong class="stat-value" id="statLowStock">0</strong>
+              <span class="stat-help">Productos a reponer</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-money">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M17 5.5c0-1.38-2.24-2.5-5-2.5S7 4.12 7 5.5 9.24 8 12 8s5 1.12 5 2.5S14.76 13 12 13s-5 1.12-5 2.5S9.24 18 12 18s5-1.12 5-2.5"/></svg>
+              </div>
+              <span class="stat-label">Valor stock</span>
+              <strong class="stat-value" id="statStockValue">$0</strong>
+              <span class="stat-help">Estimado</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-provider">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V9l7-4 7 4v12M9 13h.01M15 13h.01M9 17h.01M15 17h.01"/></svg>
+              </div>
+              <span class="stat-label">Proveedores</span>
+              <strong class="stat-value" id="statProviders">0</strong>
+              <span class="stat-help">Activos</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-purchase">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.5 7.5h-12zM6 6 4 3H1m7.5 15a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm11 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg>
+              </div>
+              <span class="stat-label">Compras</span>
+              <strong class="stat-value" id="statPurchases">0</strong>
+              <span class="stat-help">Registradas</span>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Reposición</p>
+                  <h3>Productos críticos</h3>
+                </div>
+                <button class="link-button" data-go-view="products">Ver productos</button>
+              </div>
+              <div class="list-table" id="lowStockList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Vencimientos</p>
+                  <h3>Lotes por vencer</h3>
+                </div>
+                <span class="panel-meta">Próximos 30 días</span>
+              </div>
+              <div class="list-table" id="expiringLotsList"></div>
+            </section>
+
+            <section class="panel dashboard-span-2">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Compras</p>
+                  <h3>Últimos ingresos</h3>
+                </div>
+                <button class="link-button" data-go-view="purchases">Ir a compras</button>
+              </div>
+              <div class="list-table" id="recentPurchasesList"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-products">
+          <div class="panel">
+            <div class="toolbar toolbar-grid">
+              <div class="toolbar-field">
+                <label for="productSearch">Buscar</label>
+                <input id="productSearch" type="search" placeholder="Nombre, proveedor, código, ubicación..." />
+              </div>
+              <div class="toolbar-field">
+                <label for="productCategoryFilter">Categoría</label>
+                <select id="productCategoryFilter">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <div class="toolbar-field">
+                <label for="productStatusFilter">Estado</label>
+                <select id="productStatusFilter">
+                  <option value="">Todos</option>
+                  <option value="low">Bajo mínimo</option>
+                  <option value="ok">OK</option>
+                  <option value="empty">Sin stock</option>
+                </select>
+              </div>
+              <div class="toolbar-field">
+                <label for="productSort">Ordenar por</label>
+                <select id="productSort">
+                  <option value="name">Nombre</option>
+                  <option value="category">Categoría</option>
+                  <option value="stock">Stock</option>
+                  <option value="price">Precio</option>
+                  <option value="updatedAt">Última actualización</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-header">
+              <div>
+                <p class="panel-eyebrow">Productos</p>
+                <h3>Orden general del catálogo</h3>
+              </div>
+              <button class="btn btn-primary" id="newProductBtn">Nuevo producto</button>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th>Ubicación</th>
+                    <th>Stock</th>
+                    <th>Mínimo</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th class="actions-col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-purchases">
+          <div class="panel">
+            <div class="toolbar toolbar-grid toolbar-grid-2">
+              <div class="toolbar-field">
+                <label for="purchaseSearch">Buscar</label>
+                <input id="purchaseSearch" type="search" placeholder="Comprobante, proveedor o estado..." />
+              </div>
+            </div>
+
+            <div class="table-header">
+              <div>
+                <p class="panel-eyebrow">Compras</p>
+                <h3>Ingresos de mercadería</h3>
+              </div>
+              <button class="btn btn-primary" id="newPurchaseBtn">Nueva compra</button>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Comprobante</th>
+                    <th>Proveedor</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Pagado</th>
+                    <th>Saldo</th>
+                    <th>Líneas</th>
+                    <th class="actions-col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="purchasesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-providers">
+          <div class="panel">
+            <div class="table-header">
+              <div>
+                <p class="panel-eyebrow">Proveedores</p>
+                <h3>Red de abastecimiento</h3>
+              </div>
+              <button class="btn btn-primary" id="newProviderBtn">Nuevo proveedor</button>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Proveedor</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Compras</th>
+                    <th>Productos</th>
+                    <th class="actions-col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="providersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-lots">
+          <div class="panel">
+            <div class="toolbar toolbar-grid">
+              <div class="toolbar-field">
+                <label for="lotSearch">Buscar</label>
+                <input id="lotSearch" type="search" placeholder="Producto, proveedor, lote o compra..." />
+              </div>
+              <div class="toolbar-field">
+                <label for="lotStatusFilter">Estado</label>
+                <select id="lotStatusFilter">
+                  <option value="">Todos</option>
+                  <option value="urgent">Urgente</option>
+                  <option value="expiring">Por vencer</option>
+                  <option value="expired">Vencido</option>
+                  <option value="healthy">OK</option>
+                  <option value="empty">Agotado</option>
+                </select>
+              </div>
+              <div class="toolbar-field">
+                <label for="lotDaysFilter">Ventana</label>
+                <select id="lotDaysFilter">
+                  <option value="7">7 días</option>
+                  <option value="15">15 días</option>
+                  <option value="30" selected>30 días</option>
+                  <option value="60">60 días</option>
+                </select>
+              </div>
+              <div class="toolbar-field">
+                <label for="lotSort">Ordenar por</label>
+                <select id="lotSort">
+                  <option value="expiry">Vencimiento</option>
+                  <option value="product">Producto</option>
+                  <option value="quantity">Cantidad</option>
+                  <option value="cost">Costo unitario</option>
+                  <option value="purchasedAt">Fecha compra</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-header">
+              <div>
+                <p class="panel-eyebrow">Lotes</p>
+                <h3>Seguimiento de vencimientos y remanentes</h3>
+              </div>
+              <button class="btn btn-secondary" id="goToAlertsBtn">Ver alertas</button>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Lote</th>
+                    <th>Proveedor</th>
+                    <th>Compra</th>
+                    <th>Vencimiento</th>
+                    <th>Días</th>
+                    <th>Disponible</th>
+                    <th>Costo</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="lotsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-alerts">
+          <div class="stats-grid alert-stats-grid">
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-danger">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.72 3h16.92a2 2 0 0 0 1.72-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+              </div>
+              <span class="stat-label">Vencen en 7 días</span>
+              <strong class="stat-value" id="alertExpiring7">0</strong>
+              <span class="stat-help">Urgencia máxima</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-warning">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.72 3h16.92a2 2 0 0 0 1.72-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+              </div>
+              <span class="stat-label">Vencen en 15 días</span>
+              <strong class="stat-value" id="alertExpiring15">0</strong>
+              <span class="stat-help">Seguir de cerca</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-warning">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.72 3h16.92a2 2 0 0 0 1.72-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+              </div>
+              <span class="stat-label">Vencen en 30 días</span>
+              <strong class="stat-value" id="alertExpiring30">0</strong>
+              <span class="stat-help">Planificar salida</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-danger">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.72 3h16.92a2 2 0 0 0 1.72-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+              </div>
+              <span class="stat-label">Lotes vencidos</span>
+              <strong class="stat-value" id="alertExpired">0</strong>
+              <span class="stat-help">Separar del stock útil</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-warning">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6v7H4zm10-9h6v16h-6zM4 4h6v7H4zm10 5h6v5h-6z"/></svg>
+              </div>
+              <span class="stat-label">Bajo mínimo</span>
+              <strong class="stat-value" id="alertLowStock">0</strong>
+              <span class="stat-help">Reposición pendiente</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon stat-icon-danger">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6v7H4zm10-9h6v16h-6zM4 4h6v7H4zm10 5h6v5h-6z"/></svg>
+              </div>
+              <span class="stat-label">Sin stock</span>
+              <strong class="stat-value" id="alertOutOfStock">0</strong>
+              <span class="stat-help">Falta disponibilidad</span>
+            </article>
+          </div>
+
+          <div class="dashboard-grid alerts-layout-grid">
+            <section class="panel dashboard-span-2">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Centro de alertas</p>
+                  <h3>Notificaciones para resolver</h3>
+                </div>
+                <span class="panel-meta" id="alertsFeedMeta">0 alertas activas</span>
+              </div>
+              <div class="alert-feed" id="alertCenterList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Atajos</p>
+                  <h3>Resolver rápido</h3>
+                </div>
+                <span class="panel-meta">Acciones guiadas</span>
+              </div>
+              <div class="shortcut-stack">
+                <button class="shortcut-card" data-alert-shortcut="critical">
+                  <strong>Ver solo críticas</strong>
+                  <span>Lotes vencidos y sin stock</span>
+                </button>
+                <button class="shortcut-card" data-alert-shortcut="restock">
+                  <strong>Generar reposición</strong>
+                  <span>Ir directo a compras con foco en productos faltantes</span>
+                </button>
+                <button class="shortcut-card" data-alert-shortcut="lots">
+                  <strong>Revisar lotes</strong>
+                  <span>Abrir trazabilidad y vencimientos</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Vencimientos</p>
+                  <h3>Lotes urgentes</h3>
+                </div>
+                <button class="link-button" data-go-view="lots">Ir a lotes</button>
+              </div>
+              <div class="list-table" id="alertUrgentLotsList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Vencidos</p>
+                  <h3>Lotes ya vencidos</h3>
+                </div>
+                <span class="panel-meta">Separar y revisar</span>
+              </div>
+              <div class="list-table" id="alertExpiredLotsList"></div>
+            </section>
+
+            <section class="panel dashboard-span-2">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-eyebrow">Reposición</p>
+                  <h3>Productos críticos</h3>
+                </div>
+                <button class="link-button" data-go-view="products">Ir a productos</button>
+              </div>
+              <div class="list-table" id="alertLowStockProductsList"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="modal" id="productModal">
+      <form class="modal-card" id="productForm">
+        <div class="modal-header">
+          <div>
+            <p class="panel-eyebrow">Producto</p>
+            <h3 id="productModalTitle">Nuevo producto</h3>
+          </div>
+          <button type="button" class="icon-button" data-close-modal="productModal">✕</button>
+        </div>
+        <input type="hidden" id="productId" />
+        <div class="form-grid">
+          <label>
+            Nombre
+            <input id="productName" required />
+          </label>
+          <label>
+            Categoría
+            <input id="productCategory" required />
+          </label>
+          <label>
+            Precio
+            <input id="productPrice" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Stock
+            <input id="productStock" type="number" min="0" step="1" required />
+          </label>
+          <label>
+            Stock mínimo
+            <input id="productMinStock" type="number" min="0" step="1" required />
+          </label>
+          <label>
+            Proveedor
+            <input id="productSupplierName" list="providersDatalist" />
+          </label>
+          <label>
+            Ubicación
+            <input id="productLocation" />
+          </label>
+          <label>
+            Código / barcode
+            <input id="productBarcode" />
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="productModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="saveProductBtn">Guardar producto</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="providerModal">
+      <form class="modal-card" id="providerForm">
+        <div class="modal-header">
+          <div>
+            <p class="panel-eyebrow">Proveedor</p>
+            <h3 id="providerModalTitle">Nuevo proveedor</h3>
+          </div>
+          <button type="button" class="icon-button" data-close-modal="providerModal">✕</button>
+        </div>
+        <input type="hidden" id="providerId" />
+        <div class="form-grid">
+          <label>
+            Nombre
+            <input id="providerName" required />
+          </label>
+          <label>
+            Contacto
+            <input id="providerContactName" />
+          </label>
+          <label>
+            Teléfono
+            <input id="providerPhone" />
+          </label>
+          <label>
+            Email
+            <input id="providerEmail" type="email" />
+          </label>
+          <label class="span-2">
+            Observaciones
+            <textarea id="providerNotes" rows="3"></textarea>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="providerModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="saveProviderBtn">Guardar proveedor</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="purchaseModal">
+      <form class="modal-card modal-wide" id="purchaseForm">
+        <div class="modal-header">
+          <div>
+            <p class="panel-eyebrow">Compra</p>
+            <h3>Nueva compra</h3>
+          </div>
+          <button type="button" class="icon-button" data-close-modal="purchaseModal">✕</button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Proveedor
+            <select id="purchaseProvider" required></select>
+          </label>
+          <label>
+            Comprobante
+            <input id="purchaseReference" required placeholder="FAC-A-0001" />
+          </label>
+          <label>
+            Fecha
+            <input id="purchaseDate" type="date" required />
+          </label>
+          <label>
+            Estado
+            <select id="purchaseStatus">
+              <option value="received">Recibida</option>
+              <option value="pending">Pendiente</option>
+            </select>
+          </label>
+          <label>
+            Pagado
+            <input id="purchasePaidAmount" type="number" min="0" step="0.01" value="0" />
+          </label>
+          <label class="span-2">
+            Notas
+            <textarea id="purchaseNotes" rows="2" placeholder="Detalle interno opcional"></textarea>
+          </label>
+        </div>
+
+        <div class="lines-header">
+          <div>
+            <p class="panel-eyebrow">Líneas de compra</p>
+            <h4>Qué entra al stock</h4>
+          </div>
+          <button type="button" class="btn btn-secondary" id="addPurchaseLineBtn">Agregar línea</button>
+        </div>
+
+        <div id="purchaseLines" class="purchase-lines"></div>
+
+        <div class="summary-row">
+          <div class="summary-card">
+            <span>Total estimado</span>
+            <strong id="purchaseTotal">$0</strong>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="purchaseModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="savePurchaseBtn">Guardar compra</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="purchaseDetailModal">
+      <div class="modal-card modal-wide">
+        <div class="modal-header">
+          <div>
+            <p class="panel-eyebrow">Detalle</p>
+            <h3 id="purchaseDetailTitle">Compra</h3>
+          </div>
+          <button type="button" class="icon-button" data-close-modal="purchaseDetailModal">✕</button>
+        </div>
+        <div id="purchaseDetailContent"></div>
+      </div>
+    </dialog>
+
+    <datalist id="providersDatalist"></datalist>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="./public/script.js?v=8"></script>
+  </body>
+</html>

@@ -10,8 +10,8 @@ export const productsRepository = {
   findSortedByName() {
     return this.collection().find({}).sort({ name: 1 }).toArray();
   },
-  findPaged(filter = {}, { sort = { name: 1 }, skip = 0, limit = 10, projection } = {}) {
-    return this.collection().find(filter, projection ? { projection } : {}).sort(sort).skip(skip).limit(limit).toArray();
+  findPaged(filter = {}, { sort = { name: 1 }, skip = 0, limit = 10 } = {}) {
+    return this.collection().find(filter).sort(sort).skip(skip).limit(limit).toArray();
   },
   distinctCategories(filter = {}) {
     return this.collection().distinct('category', filter);
@@ -28,25 +28,22 @@ export const productsRepository = {
   findDuplicateNormalizedName(normalizedName, _id) {
     return this.collection().findOne({ normalizedName, _id: { $ne: _id } });
   },
-  insertOne(doc, options = {}) {
-    return this.collection().insertOne(doc, options);
+  insertOne(doc) {
+    return this.collection().insertOne(doc);
   },
   updateById(_id, update, options = {}) {
     return this.collection().findOneAndUpdate({ _id }, update, options);
   },
-  updateOne(filter, update, options = {}) {
-    return this.collection().updateOne(filter, update, options);
+  updateOne(filter, update) {
+    return this.collection().updateOne(filter, update);
   },
-  bulkWrite(operations, options = {}) {
-    return this.collection().bulkWrite(operations, options);
-  },
-  deleteById(_id, options = {}) {
-    return this.collection().deleteOne({ _id }, options);
+  deleteById(_id) {
+    return this.collection().deleteOne({ _id });
   },
   countDocuments(filter = {}) {
     return this.collection().countDocuments(filter);
   },
-  deleteMany(filter = {}, options = {}) {
-    return this.collection().deleteMany(filter, options);
+  deleteMany(filter = {}) {
+    return this.collection().deleteMany(filter);
   },
 };
